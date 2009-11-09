@@ -1,5 +1,6 @@
 #include "VPR.h"
 
+#include <iostream>
 #include <float.h>
 
 using namespace std;
@@ -40,8 +41,14 @@ RtVoid VolumetricParticleSolver::DoIt(RtInt NVert, RtInt N, RtToken Tokens[], Rt
 		BB[1].y = max( BB[1].y, PosPointer[i][1] );
 		BB[1].z = max( BB[1].z, PosPointer[i][2] );
 	}
-
-
+	
+	if( BB[1].x < BB[0].x || BB[1].y < BB[0].y || BB[1].z < BB[0].z )
+	{
+		cerr<<"ParticleResolverPlugin : "<<" Bounding Box Is Error"<<endl;
+		return;
+	}
+	
+	
 
 }
 

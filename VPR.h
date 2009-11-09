@@ -20,6 +20,8 @@ public:
 	VolumetricParticleSolver();
 	~VolumetricParticleSolver();
 
+	/** \brief Setup the resolution of volume, the greater the better, but the memory and speed should be considered.
+	 */
 	void SetRes(const RtInt&, const RtInt&, const RtInt&);
 	
 	/**
