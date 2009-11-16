@@ -1,7 +1,10 @@
 #include "VPR.h"
+#include "VPRUtil.h"
 
 #include <iostream>
 #include <float.h>
+
+#include <lsm_fast_marching_method.h>
 
 using namespace std;
 using namespace PR;

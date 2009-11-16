@@ -4,7 +4,9 @@
 #include <thrust/device_vector.h>
 #include <thrust/copy.h>
 
+#include <boost/progress.hpp>
 #include <boost/scoped_array.hpp>
+
 
 struct TentKernel
 {
@@ -54,23 +56,27 @@ bool MakeTent(const size_t Len, const float3* Points, const int Res[3], const fl
 				{
 					int XOffset = x;
 					float3 P;
-					P.x = ( (float)x+0.5 )*Delta.x + Min.x;
-					P.y = ( (float)y+0.5 )*Delta.y + Min.y;
-					P.z = ( (float)z+0.5 )*Delta.z + Min.z;
+					P.x = ( (float)x+0.5f )*Delta.x + Min.x;
+					P.y = ( (float)y+0.5f )*Delta.y + Min.y;
+					P.z = ( (float)z+0.5f )*Delta.z + Min.z;
 					GridPosHst[ZOffset+YOffset+XOffset] = P;
 				}
 			}
 		}
 		thrust::copy(GridPosHst.get(),GridPosHst.get()+TotalCount,GridPosDev.begin());
 		GridPosHst.reset();
+
+		boost::progress_display Progress(Len);
+		boost::progress_timer Timer;
 		
+		std::cout<<"ParticleResolver : MakeTent Start to Calculate the Tent Function"<<std::endl;
 		for( size_t i=0; i<Len; ++i )
 		{
 			thrust::transform(GridPosDev.begin(),GridPosDev.end(),TentFuncDev.begin(),TentFuncDev.end(),TentKernel(Points[i]));
+			++Progress;
 		}
-		
 		thrust::copy(TentFuncDev.begin(),TentFuncDev.end(),Data);
-		
+
 	}catch(...)
 	{
 		return false;
