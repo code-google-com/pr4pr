@@ -66,6 +66,11 @@ struct Float3
 	{
 	}
 	float x,y,z;
+
+	friend std::ostream& operator<<(std::ostream& OS, const Float3& P)
+	{
+		return OS<<P.x<<' '<<P.y<<' '<<P.z;
+	}
 };
 
 /**
