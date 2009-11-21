@@ -1,8 +1,16 @@
 #include "VPR.h"
 #include "VPRUtil.h"
 
+#ifdef _MSC_VER
+	#include <process.h>
+	#include <stdio.h>
+#else
+	#include <stdio.h>
+#endif
+
 #include <iostream>
 #include <float.h>
+#include <time.h>
 
 #include <boost/scoped_array.hpp>
 
@@ -11,7 +19,7 @@
 using namespace std;
 using namespace PR;
 
-VolumetricParticleSolver::VolumetricParticleSolver()
+VolumetricParticleSolver::VolumetricParticleSolver() : mNCopies(0)
 {
 	mRes[0] = mRes[1] = mRes[2] = 2;
 }
@@ -51,7 +59,7 @@ RtVoid VolumetricParticleSolver::DoIt(RtInt NVert, RtInt N, RtToken Tokens[], Rt
 	Size.y = BB[1].y - BB[0].y;
 	Size.z = BB[1].z - BB[0].z;
 	
-	cout<<fixed<<"ParticleResolverPlugin : "<<"VolumetricParticleSolver Bounding Box "<<"["<<BB[0]<<' '<<BB[1]<<"]"<<endl;
+	cout<<fixed<<"ParticleResolverPlugin : "<<"VolumetricParticleSolver Bounding Box "<<endl<<"\t["<<BB[0]<<' '<<BB[1]<<"]"<<endl;
 
 	float3 BBCopy[2];
 	BBCopy[0].x = BB[0].x;
@@ -61,8 +69,9 @@ RtVoid VolumetricParticleSolver::DoIt(RtInt NVert, RtInt N, RtToken Tokens[], Rt
 	BBCopy[1].y = BB[1].y;
 	BBCopy[1].z = BB[1].z;
 
-	boost::scoped_array<float> TentFunc(new float[mRes[0]*mRes[1]*mRes[2]]);
-	boost::scoped_array<float> SDF(new float[mRes[0]*mRes[1]*mRes[2]]);
+	const size_t TotalCount = mRes[0]*mRes[1]*mRes[2];
+	boost::scoped_array<float> TentFunc(new float[TotalCount]);
+	boost::scoped_array<float> SDF(new float[TotalCount]);
 	bool Ok = MakeTent(NVert,(const float3*)PosPointer,mRes,BBCopy[0],BBCopy[1],TentFunc.get());
 	if(Ok)
 	{
@@ -76,11 +85,52 @@ RtVoid VolumetricParticleSolver::DoIt(RtInt NVert, RtInt N, RtToken Tokens[], Rt
 			cerr<<"ParticleResolverPlugin : "<<"VolumetricParticleSolver Can't Solve SDF."<<endl;
 			return;
 		}
-	}
 
-	/// \todo Write .BKM or .PRT file ?
+		// Dump for test
+		char CharBuf[256];
+		sprintf(CharBuf,"%d.raw",time(NULL));
+		FILE* FP = fopen(CharBuf,"wb");
+		fwrite(SDF.get(),sizeof(float),TotalCount,FP);
+		fflush(FP);
+		fclose(FP);
+	}
+//
+//	 \todo Write .BKM or .PRT file ?
+//	wstring BkmMakerBinPath, CmdArg;
+//	intptr_t Ret = -1;
+//#ifdef _MSC_VER
+//	wchar_t* SysVar = _wgetenv(L"RMANTREE");
+//	if( SysVar == NULL )
+//	{
+//		return;
+//	}
+//	BkmMakerBinPath.append(L"bin\\brickmake.exe");
+//	Ret = _wspawnl(_P_WAIT,BkmMakerBinPath.c_str(),CmdArg.c_str(),NULL);
+//#else
+//	BkmMakerBinPath = wgetenv(L"RMANTREE");
+//	BkmMakerBinPath.append(L"bin/brickmake");
+//	Ret = wspawnl(P_WAIT,BkmMakerBinPath.c_str(),CmdArg.c_str(),NULL);
+//#endif
+//
+//	if( Ret != 0 )
+//	{
+//		cerr<<"ParticleResolverPlugin : "<<"VolumetricParticleSolver Have Not Got Success From brickmake"<<endl;
+//	}
 }
 
 void VolumetricParticleSolver::SetRes(const RtInt& X, const RtInt& Y, const RtInt& Z)
 {
+	mRes[0] = X;
+	mRes[1] = Y;
+	mRes[2] = Z;
+}
+
+void VolumetricParticleSolver::SetNCopies(const RtInt& NCopies)
+{
+	mNCopies = NCopies;
+}
+
+void VolumetricParticleSolver::SetBkmPath(const char* Path)
+{
+	mBkmPath = Path;
 }

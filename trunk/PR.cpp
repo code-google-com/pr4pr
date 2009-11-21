@@ -32,6 +32,7 @@
 #include "OPR.h"
 #include "DPR.h"
 #include "EPR.h"
+#include "VPR.h"
 
 using namespace std;
 using namespace PR;
@@ -46,6 +47,9 @@ using namespace PR;
 #define BOUND "Bound"
 #define VOLRES "VolRes"
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+DLLEXPORT
 RifPlugin* RifPluginManufacture(int argc, char **argv)
 {
 	return new ParticleResolverPlugin(argc,argv);
@@ -54,6 +58,7 @@ RifPlugin* RifPluginManufacture(int argc, char **argv)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 auto_ptr<ParticleResolver> ParticleResolverPlugin::Instance;
+ParticleResolver::Type ParticleResolverPlugin::CurrentPR;
 
 RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[], RtPointer Data[])
 {
@@ -69,28 +74,44 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 				case 0:
 					cout<<"ParticleResolverPlugin : Using OriginParticleResolver"<<endl;
 					Instance.reset( new OriginParticleResolver );
+					CurrentPR = ParticleResolver::OPR;
 					break;
 				case 1:
 					cout<<"ParticleResolverPlugin : Using DiffusionParticleResolver"<<endl;
 					Instance.reset( new DiffusionParticleResolver );
+					CurrentPR = ParticleResolver::DPR;
 					break;
 				case 2:
 					cout<<"ParticleResolverPlugin : Using ExternalParticleResolver"<<endl;
 					Instance.reset( new ExternalParticleResolver );
+					CurrentPR = ParticleResolver::EPR;
+					break;
+				case 3:
+					cout<<"ParticleResolverPlugin : Using VolumetricParticleSolver"<<endl;
+					Instance.reset( new VolumetricParticleSolver );
+					CurrentPR = ParticleResolver::VPR;
 					break;
 				}
+
+				continue;
 			}else if( strstr(Tokens[i],NCOPIES) )
 			{
-				int NCopies = *(int*)Data[0];
-				DiffusionParticleResolver* p = dynamic_cast<DiffusionParticleResolver*>( Instance.get() );
-				if( p )
+				if( CurrentPR == ParticleResolver::DPR )
 				{
+					int NCopies = *(int*)Data[0];
+					DiffusionParticleResolver* p = dynamic_cast<DiffusionParticleResolver*>( Instance.get() );
 					p->SetNCopies(NCopies);
-					cout<<"ParticleResolverPlugin : NCopies ["<< NCopies <<"]"<<endl;
+				}else if( CurrentPR == ParticleResolver::VPR )
+				{
+					int NCopies = *(int*)Data[0];
+					VolumetricParticleSolver* p = dynamic_cast<VolumetricParticleSolver*>( Instance.get() );
+					p->SetNCopies(NCopies);
 				}else
 				{
-					cerr<<"ParticleResolverPlugin : Only DiffusionParticleResolver Use Attribute ["<<NCOPIES<<"]"<<endl;
+					cerr<<"ParticleResolverPlugin : Only DiffusionParticleResolver Or VolumetricParticleSolver Use Attribute ["<<NCOPIES<<"]"<<endl;
 				}
+
+				continue;
 			}else if( strstr(Tokens[i],RANDPATTERN) )
 			{
 				int RandPattern = *(int*)Data[0];
@@ -103,6 +124,8 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 				{
 					cerr<<"ParticleResolverPlugin : Only DiffusionParticleResolver Use Attribute ["<<RANDPATTERN<<"]"<<endl;
 				}
+
+				continue;
 			}else if( strstr(Tokens[i],FALLOFF) )
 			{
 				float Falloff = *(float*)Data[0];
@@ -115,6 +138,8 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 				{
 					cerr<<"ParticleResolverPlugin : Only DiffusionParticleResolver Use Attribute ["<<FALLOFF<<"]"<<endl;
 				}
+
+				continue;
 			}else if( strstr(Tokens[i],SEED) )
 			{
 				int Seed = *(int*)Data[0];
@@ -127,6 +152,8 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 				{
 					cerr<<"ParticleResolverPlugin : Only DiffusionParticleResolver Use Attribute ["<<SEED<<"]"<<endl;
 				}
+
+				continue;
 			}else if( strstr(Tokens[i],BOUND) )
 			{
 				// \todo We have to deal with array.
@@ -147,9 +174,25 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 				{
 					cerr<<"ParticleResolverPlugin : Only ExternalParticleResolver Use Attribute ["<<BOUND<<"]"<<endl;
 				}
+
+				continue;
 			}else if( strstr(Tokens[i],VOLRES) )
 			{
-
+				int** Res = (int**)Data;
+				VolumetricParticleSolver* p = dynamic_cast<VolumetricParticleSolver*>( Instance.get() );
+				int X = *Res[0];
+				int Y = *Res[1];
+				int Z = *Res[2];
+				p->SetRes(	X,Y,Z);
+				continue;
+			}else if( strstr(Tokens[i],PATH) )
+			{
+				if( CurrentPR == ParticleResolver::VPR )
+				{
+					char* Path = * (char**)Data[0];
+					VolumetricParticleSolver* p = dynamic_cast<VolumetricParticleSolver*>( Instance.get() );
+					p->SetBkmPath( Path );
+				}
 			}
 		}
 	}
@@ -161,6 +204,7 @@ RtVoid ParticleResolverPlugin::PointsV(RtInt NVerts, RtInt N, RtToken Tokens[], 
 	cout<<"ParticleResolverPlugin : Found ["<<NVerts<<"] And ["<<N<<"] Tokens"<<endl;
 	Instance->DoIt(NVerts,N,Tokens,Data);
 	Instance.reset( new OriginParticleResolver );
+	CurrentPR = ParticleResolver::OPR;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +215,7 @@ ParticleResolverPlugin::ParticleResolverPlugin(int argc, char** argv)
 	mRF.PointsV = ParticleResolverPlugin::PointsV;
 
 	Instance.reset( new OriginParticleResolver );
+	CurrentPR = ParticleResolver::OPR;
 }
 
 ParticleResolverPlugin::~ParticleResolverPlugin()

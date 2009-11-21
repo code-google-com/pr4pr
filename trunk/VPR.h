@@ -22,13 +22,17 @@ public:
 	VolumetricParticleSolver();
 	~VolumetricParticleSolver();
 
+	/** \brief Similar to DiffusionParticleResolver::SetNCopies. It indicates how many cloned points should be filled into one voxel.
+	 */
+	void SetNCopies(const RtInt&);
+
 	/** \brief Setup the resolution of volume, the greater the better, but the memory and speed should be considered.
 	 */
 	void SetRes(const RtInt&, const RtInt&, const RtInt&);
 
 	/** \brief Assign the .bkm path.
 	 */
-	void SetBKMPath(const char*);
+	void SetBkmPath(const char*);
 	
 	/**
 	 * \warning It will not call RiPointsV.
@@ -36,7 +40,8 @@ public:
 	RtVoid DoIt(RtInt, RtInt, RtToken [], RtPointer []);
 private:
 	RtInt mRes[3];
-	std::string mBKMPath;
+	RtInt mNCopies;
+	std::string mBkmPath;
 };
 
 NAMESPACE_PR_END

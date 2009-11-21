@@ -40,6 +40,7 @@ bool MakeTent(const size_t Len, const float3* Points, const int Res[3], const fl
 		Delta.y = Extent.y / (float)Res[1];
 		Delta.z = Extent.z / (float)Res[2];
 		
+		std::cout<<"MakeTent "<<Res[0]<<'\t'<<Res[1]<<'\t'<<Res[2]<<std::endl;
 		const int TotalCount = Res[0]*Res[1]*Res[2];
 		
 		boost::scoped_array<float3> GridPosHst(new float3[TotalCount]);
