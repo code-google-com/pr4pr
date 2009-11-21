@@ -79,6 +79,21 @@ struct Float3
 class ParticleResolver
 {
 public:
+	/**
+	 * \brief Outline of PR type.
+	 */
+	enum Type
+	{
+		OPR,
+		DPR,
+		EPR,
+		KKPR,
+		VPR
+	};
+
+	/**
+	 * \brief Constructor
+	 */
 	ParticleResolver()
 	{
 	}
@@ -99,7 +114,7 @@ class ParticleResolverPlugin : public RifPlugin
 {
 public:
 	static std::auto_ptr<ParticleResolver> Instance;
-
+	static ParticleResolver::Type CurrentPR;
 	static RtVoid AttributeV(RtToken, RtInt, RtToken [], RtPointer []);
 	static RtVoid PointsV(RtInt, RtInt, RtToken [], RtPointer []);
 	
