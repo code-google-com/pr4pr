@@ -33,6 +33,7 @@
 #include "DPR.h"
 #include "EPR.h"
 #include "VPR.h"
+#include "KKPR.h"
 
 using namespace std;
 using namespace PR;
@@ -183,7 +184,7 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 				int X = *Res[0];
 				int Y = *Res[1];
 				int Z = *Res[2];
-				p->SetRes(	X,Y,Z);
+				p->SetRes(X,Y,Z);
 				continue;
 			}else if( strstr(Tokens[i],PATH) )
 			{
@@ -192,6 +193,11 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 					char* Path = * (char**)Data[0];
 					VolumetricParticleSolver* p = dynamic_cast<VolumetricParticleSolver*>( Instance.get() );
 					p->SetBkmPath( Path );
+				}else if( CurrentPR == ParticleResolver::KKPR )
+				{
+					char* Path = * (char**)Data[0];
+					KKParticleResolver* p = dynamic_cast<KKParticleResolver*>( Instance.get() );
+					p->SetPath(Path);
 				}
 			}
 		}
