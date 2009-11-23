@@ -10,6 +10,17 @@ NAMESPACE_PR_BEGIN
 class ExternalParticleResolver : public ParticleResolver
 {
 public:
+	/**
+	 * \brief Structure for passing the data to user-defined procedural primitive.
+	 */
+	struct SwapData
+	{
+		int NVerts;
+		int NAttrs;
+		char** AttrNames;
+		void** AttrData;
+	};
+
 	ExternalParticleResolver();
 	~ExternalParticleResolver();
 

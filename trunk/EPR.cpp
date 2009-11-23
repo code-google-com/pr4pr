@@ -25,9 +25,14 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+ * User who write procedural primitive DSO which was managed by EPR must retrieve data by EPR::SwapData.
+ */
+
 #include "EPR.h"
 
 #include <ri.h>
+#inclue
 
 using namespace PR;
 
@@ -46,7 +51,12 @@ void ExternalParticleResolver::SetPath(const char* Path)
 
 RtVoid ExternalParticleResolver::DoIt(RtInt NVerts, RtInt N, RtToken Tokens[], RtPointer Data[])
 {
-	RiPointsV(NVerts,N,Tokens,Data);
+	boost::scoped_array<SwapData> SD(new SwapData);
+	SwapData->NVerts = NVerts;
+	SwapData->NAttrs = N;
+	SwapData->AttrNames = Tokens;
+	SwapData->AttrData = Data;
+	RiProcedural(SD.get(),mB,RiProcDynamicLoad,NULL);
 }
 
 void ExternalParticleResolver::SetBound(const RtBound& B)
