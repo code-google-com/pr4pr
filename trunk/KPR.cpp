@@ -44,20 +44,20 @@ using namespace PR;
 
 static float ConstWidth = 0.16666666f;
 
-KKParticleResolver::KKParticleResolver()
+KrakatoaParticleResolver::KrakatoaParticleResolver()
 {
 }
 
-KKParticleResolver::~KKParticleResolver()
+KrakatoaParticleResolver::~KrakatoaParticleResolver()
 {
 }
 
-void KKParticleResolver::SetPath(const char* Path)
+void KrakatoaParticleResolver::SetPath(const char* Path)
 {
 	mPath = Path;
 }
 
-RtVoid KKParticleResolver::DoIt(RtInt NVerts, RtInt N, RtToken Tokens[], RtPointer Data[])
+RtVoid KrakatoaParticleResolver::DoIt(RtInt NVerts, RtInt N, RtToken Tokens[], RtPointer Data[])
 {
 	auto_ptr<PRT> PRTFile( new PRT );
 	const string Path = mPath;

@@ -7,11 +7,11 @@ NAMESPACE_PR_BEGIN
  * 
  * It would load an external <a href="http://software.primefocusworld.com/software/support/krakatoa/">Krakatoa</a> .PRT file and render it.
  */
-class KKParticleResolver : public ParticleResolver
+class KrakatoaParticleResolver : public ParticleResolver
 {
 public:
-	KKParticleResolver();
-	~KKParticleResolver();
+	KrakatoaParticleResolver();
+	~KrakatoaParticleResolver();
 
 	void SetPath(const char*);
 	RtVoid DoIt(RtInt, RtInt, RtToken [], RtPointer []);

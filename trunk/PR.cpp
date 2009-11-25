@@ -88,6 +88,11 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 					CurrentPR = ParticleResolver::EPR;
 					break;
 				case 3:
+					cout<<"ParticleResolverPlugin : Using KrakatoaParticleResolver"<<endl;
+					Instance.reset( new KrakatoaParticleResolver );
+					CurrentPR = ParticleResolver::KPR;
+					break;
+				case 4:
 					cout<<"ParticleResolverPlugin : Using VolumetricParticleSolver"<<endl;
 					Instance.reset( new VolumetricParticleSolver );
 					CurrentPR = ParticleResolver::VPR;
@@ -193,10 +198,10 @@ RtVoid ParticleResolverPlugin::AttributeV(RtToken Name, RtInt N, RtToken Tokens[
 					char* Path = * (char**)Data[0];
 					VolumetricParticleSolver* p = dynamic_cast<VolumetricParticleSolver*>( Instance.get() );
 					p->SetBkmPath( Path );
-				}else if( CurrentPR == ParticleResolver::KKPR )
+				}else if( CurrentPR == ParticleResolver::KPR )
 				{
 					char* Path = * (char**)Data[0];
-					KKParticleResolver* p = dynamic_cast<KKParticleResolver*>( Instance.get() );
+					KrakatoaParticleResolver* p = dynamic_cast<KrakatoaParticleResolver*>( Instance.get() );
 					p->SetPath(Path);
 				}
 			}
