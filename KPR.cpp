@@ -25,7 +25,7 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "KKPR.h"
+#include "KPR.h"
 #include "PRT.h"
 
 #include <iostream>
