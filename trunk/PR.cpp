@@ -33,7 +33,7 @@
 #include "DPR.h"
 #include "EPR.h"
 #include "VPR.h"
-#include "KKPR.h"
+#include "KPR.h"
 
 using namespace std;
 using namespace PR;

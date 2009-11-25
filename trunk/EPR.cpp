@@ -31,8 +31,9 @@
 
 #include "EPR.h"
 
+#include <boost/scoped_ptr.hpp>
+
 #include <ri.h>
-#inclue
 
 using namespace PR;
 
@@ -51,11 +52,11 @@ void ExternalParticleResolver::SetPath(const char* Path)
 
 RtVoid ExternalParticleResolver::DoIt(RtInt NVerts, RtInt N, RtToken Tokens[], RtPointer Data[])
 {
-	boost::scoped_array<SwapData> SD(new SwapData);
-	SwapData->NVerts = NVerts;
-	SwapData->NAttrs = N;
-	SwapData->AttrNames = Tokens;
-	SwapData->AttrData = Data;
+	boost::scoped_ptr<SwapData> SD(new SwapData);
+	SD->NVerts = NVerts;
+	SD->NAttrs = N;
+	SD->AttrNames = Tokens;
+	SD->AttrData = Data;
 	RiProcedural(SD.get(),mB,RiProcDynamicLoad,NULL);
 }
 
