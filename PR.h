@@ -87,7 +87,7 @@ public:
 		OPR,
 		DPR,
 		EPR,
-		KKPR,
+		KPR,
 		VPR
 	};
 
