@@ -1,0 +1,29 @@
+	proc pi(float $searchingDistance, int $interpolateCount, int $visualize)
+	{
+		waitCursor -state on;
+		particleInterpolate -sd $searchingDistance -ic $interpolateCount -v $visualize;
+		waitCursor -state off;
+	}
+
+	proc hitButton(string $floatUI, string $intUI, string $v)
+	{
+		float $sd = `floatFieldGrp -q -value1 $floatUI`;
+		int $ic = `intFieldGrp -q -value1 $intUI`;
+		int $vv = `checkBox -q -v $v`;
+		pi($sd, $ic, $vv);
+	}
+	
+	if(`window -exists piWindow`)
+		deleteUI piWindow;
+	window -title "Particle Interpolate" -widthHeight 100 50 -resizeToFitChildren true  piWindow;
+		columnLayout -columnAlign "center";
+			
+			string $sdUI = `floatFieldGrp -numberOfFields 1 -label "Searching Distance" -value1 1.0`;
+			string $icUI = `intFieldGrp -numberOfFields 1 -label "Interpolate Count" -value1 4`;
+		setParent ..;
+		columnLayout -columnOffset "left" 50;
+			string $vUI = `checkBox -label "visualize" -align "center" -value off`;
+			button -label "Do it" -width 100 -command "hitButton($sdUI, $icUI, $vUI)";
+	showWindow piWindow;
+	
+	
