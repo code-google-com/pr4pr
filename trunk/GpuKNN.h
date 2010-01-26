@@ -1,7 +1,9 @@
 ﻿#ifndef GPUKNN
 #define GPUKNN
 
-#include <thrust/device_vector>
+#include <thrust/device_vector.h>
+
+NAMESPACE_PR_BEGIN
 
 class GpuKNN
 {
@@ -12,5 +14,7 @@ private:
 	thrust::device_vector<float3> mPoints;
 	thrust::device_vector<int> mIndices;
 };
+
+NAMESPACE_PR_END
 
 #endif
